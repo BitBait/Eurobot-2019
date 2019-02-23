@@ -268,10 +268,10 @@ def drawarrow(surface, node, thing):
 def AddBox(Graph, left, top, width, height, mode=""):
     # Outlines the rectangle specified from top-right edge of the object up to the right and bottom edges
     # N.B. If a rectangle goes outside of the arena, its edges will be clipped to the arena edges
-    left = max(0, left)
-    top = max(0, top)
     right = min(left + width, Graph.w)
     bottom = min(top + height, Graph.h)
+    left = max(0, left)
+    top = max(0, top)
     if mode in ["outline", ""]:
         for x in range(left, right):
             # Along top edge
@@ -308,22 +308,23 @@ def AddBox(Graph, left, top, width, height, mode=""):
     print("Rectangle drawn: (%s, %s, %s, %s) %s" % (left, top, width, height, mode))
 
 
-griddimensions = (300, 200)  # 3000 x 2000 got me a MemoryError when using the A Star Algorithm
+griddimensions = (300, 200)  # 3000 x 2000 gets a MemoryError when using the A Star Algorithm
 squaresidelength = 3  # int(min(w, h) / max(griddimensions))
 
 startnodepos = (0, 0)
-goalnodepos = (80, 50)
-print(startnodepos, goalnodepos)
+goalnodepos = (0, 170)
+print("Start:", startnodepos, "Goal", goalnodepos)
 
 TBT = GeneralGrid()
 TBT.CreateNodeGrid(*griddimensions)
 
+# Extract rows from Boxes.csv and draw the boxes they represent as walls on the graph
 with open("Boxes.csv") as csvfile:
     boxreader = csv.reader(csvfile)
     for boxrow in boxreader:
         print(boxrow)
         if str(boxrow[0]) == "LEFT":
-            print("Found Header in Boxes.csv:", boxrow)
+            print("Found Header")
         elif len(boxrow) == 4:
             AddBox(TBT,
                    int(boxrow[0]), int(boxrow[1]),
@@ -338,8 +339,6 @@ TBTTest = AStartSearch(TBT, TBT.NodeList[nodename(startnodepos)], TBT.NodeList[n
 PathTBT = ReconstructPath(TBTTest, TBT.NodeList[nodename(startnodepos)], TBT.NodeList[nodename(goalnodepos)])
 ListOfThings3 = TellRobot(PathTBT)
 print(ListOfThings3)
-
-#print(len(TBT.NodeList))
 
 while True:
     # Colour in window white
