@@ -84,11 +84,15 @@ class GeneralGrid:
     def __init__(self):
         self.x = 0
         self.y = 0
+        self.w = None
+        self.h = None
         self.NodeList = {}
         self.weights = {}
         self.GraphGrid = Graph()
 
     def CreateNodeGrid(self, SizeX, SizeY):
+        self.w = SizeX
+        self.h = SizeY
         # Maybe this could be done with two nested for loops? (i.e. for x in range(SizeX):
         #                                                               for y in range(SizeY):
         #                                                                   self.NodeLis.......... )
@@ -260,24 +264,47 @@ def drawarrow(surface, node, thing):
                           (nodepos[1] + 0.5 + cos(ang) * 0.4) * squaresidelength)])
 
 
+def AddBox(Graph, left, top, width, height):
+    # Outlines the rectangle specified from top-right edge of the object up to the right and bottom edges
+    # N.B. If a rectangle goes outside of the arena, its edges will be clipped to the arena edges
+    print(Graph.x)
+    left = max(0, left)
+    top = max(0, top)
+    right = min(left + width, Graph.w)
+    bottom = min(top + height, Graph.h)
+    for x in range(left, right):
+        # Along top edge
+        node = Graph.NodeList.get(nodename((x, top)))
+        print(node.Name)
+        node.Wall = True
+        # Along bottom edge (nodes just above selected, to fill correct side vertical length)
+        node = Graph.NodeList.get(nodename((x, bottom - 1)))
+        print(node.Name)
+        node.Wall = True
+    for y in range(top + 1, bottom):
+        # Along left edge
+        node = Graph.NodeList.get(nodename((left, y)))
+        print(node.Name)
+        node.Wall = True
+        # Along right edge (nodes just to left selected, to fill correct horizontal length)
+        node = Graph.NodeList.get(nodename((right - 1, y)))
+        print(node.Name)
+        node.Wall = True
+
+
 griddimensions = (300, 200)  # 3000 x 2000 got me a MemoryError when using the A Star Algorithm
 squaresidelength = 3  # int(min(w, h) / max(griddimensions))
 
 startnodepos = (0, 0)
-goalnodepos = (70, 171)
+goalnodepos = (80, 110)
 print(startnodepos, goalnodepos)
-
-# Path = ReconstructPath(Testing, TestGraph.A, TestGraph.E)
-# print(Path)
-# ListOfThings = TellRobot(Path)
-# print(ListOfThings)
 
 TBT = GeneralGrid()
 TBT.CreateNodeGrid(*griddimensions)
-#print(len(list((TBT.NodeList.values()))))
+AddBox(TBT, 10, 0, 30, 101)
+
 TBTTest = AStartSearch(TBT, TBT.NodeList[nodename(startnodepos)], TBT.NodeList[nodename(goalnodepos)])
 PathTBT = ReconstructPath(TBTTest, TBT.NodeList[nodename(startnodepos)], TBT.NodeList[nodename(goalnodepos)])
-#print(PathTBT)
 ListOfThings3 = TellRobot(PathTBT)
 print(ListOfThings3)
 
