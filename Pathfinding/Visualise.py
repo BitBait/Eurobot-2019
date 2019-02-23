@@ -5,7 +5,7 @@ from pygame.locals import *
 
 # Initialise the pygame window
 pygame.init()
-w, h = 500, 500
+w, h = 900, 600
 screen = pygame.display.set_mode((w, h))
 
 # A whole bunch of colours, represented in the form (R, G, B)
@@ -218,18 +218,18 @@ def ToggleWall(Graph):
     FloorX = floor(MouseX)
     FloorY = floor(MouseY)
 
-    while FloorX % 50 != 0:
+    while FloorX % squaresidelength != 0:
         FloorX -= 1
         if FloorX == 0:
             break
 
-    while FloorY % 50 != 0:
+    while FloorY % squaresidelength != 0:
         FloorY -= 1
         if FloorY == 0:
             break
 
-    FloorX = FloorX/50
-    FloorY = FloorY/50
+    FloorX = FloorX/squaresidelength
+    FloorY = FloorY/squaresidelength
 
     FloorX = int(FloorX)
     FloorY = int(FloorY)
@@ -260,11 +260,11 @@ def drawarrow(surface, node, thing):
                           (nodepos[1] + 0.5 + cos(ang) * 0.4) * squaresidelength)])
 
 
-griddimensions = (10, 10)
-squaresidelength = int(min(w, h) / max(griddimensions))
+griddimensions = (300, 200)  # 3000 x 2000 got me a MemoryError when using the A Star Algorithm
+squaresidelength = 3  # int(min(w, h) / max(griddimensions))
 
 startnodepos = (0, 0)
-goalnodepos = (7, 7)
+goalnodepos = (70, 171)
 print(startnodepos, goalnodepos)
 
 # Path = ReconstructPath(Testing, TestGraph.A, TestGraph.E)
@@ -310,21 +310,12 @@ while True:
                                      (node.Position[0] * squaresidelength, node.Position[1] * squaresidelength,
                                       squaresidelength, squaresidelength))
                 # ... draw an arrow on the node
-                drawarrow(screen, node, ListOfThings3[i])
+                # drawarrow(screen, node, ListOfThings3[i])
             else:
                 # ... otherwise it is the goal node. Colour it green
                 pygame.draw.rect(screen, COL_GREEN,
                                  (node.Position[0] * squaresidelength, node.Position[1] * squaresidelength,
                                  squaresidelength, squaresidelength))
-    # Draw the vertical red grid lines, then the horizontal ones
-    for x in range(1, griddimensions[0]):
-        pygame.draw.line(screen, COL_RED,
-                         (x * squaresidelength, 0),
-                         (x * squaresidelength, griddimensions[1] * squaresidelength))
-    for y in range(1, griddimensions[1]):
-        pygame.draw.line(screen, COL_RED,
-                         (0, y * squaresidelength),
-                         (griddimensions[0] * squaresidelength, y * squaresidelength))
     # Display the newly coloured window
     pygame.display.flip()
     # Event handling
