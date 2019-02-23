@@ -1,4 +1,5 @@
 import collections
+import csv
 from math import pi, sin, cos, floor, sqrt
 import pygame
 from pygame.locals import *
@@ -167,7 +168,7 @@ def AStartSearch(Graph , Start, Goal):
                     CostSoFar += NewCost
                     frontier.put(Next)
                     CameFrom[Next] = Current
-                    print("Visiting %r" % Current.Name)
+                    # print("Visiting %r" % Current.Name)
 
     return CameFrom
 
@@ -239,11 +240,11 @@ def ToggleWall(Graph):
     FloorY = int(FloorY)
 
     NodePos = (FloorX, FloorY)
-    print(NodePos)
+    # print(NodePos)
 
     x = Graph.NodeList.get(nodename(NodePos))
     x.Wall = not x.Wall
-    print(x.Name)
+    print(x.Name, "Toggled to", ["Not-Wall", "Wall"][int(x.Wall)])
 
 
 def drawarrow(surface, node, thing):
@@ -264,47 +265,47 @@ def drawarrow(surface, node, thing):
                           (nodepos[1] + 0.5 + cos(ang) * 0.4) * squaresidelength)])
 
 
-def AddBox(Graph, left, top, width, height, mode="outline"):
+def AddBox(Graph, left, top, width, height, mode=""):
     # Outlines the rectangle specified from top-right edge of the object up to the right and bottom edges
     # N.B. If a rectangle goes outside of the arena, its edges will be clipped to the arena edges
-    print(Graph.x)
     left = max(0, left)
     top = max(0, top)
     right = min(left + width, Graph.w)
     bottom = min(top + height, Graph.h)
-    if mode == "outline":
+    if mode in ["outline", ""]:
         for x in range(left, right):
             # Along top edge
             node = Graph.NodeList.get(nodename((x, top)))
-            print(node.Name)
+            # print(node.Name)
             node.Wall = True
             # Along bottom edge (nodes just above selected, to fill correct side vertical length)
             node = Graph.NodeList.get(nodename((x, bottom - 1)))
-            print(node.Name)
+            # print(node.Name)
             node.Wall = True
         for y in range(top + 1, bottom):
             # Along left edge
             node = Graph.NodeList.get(nodename((left, y)))
-            print(node.Name)
+            # print(node.Name)
             node.Wall = True
             # Along right edge (nodes just to left selected, to fill correct horizontal length)
             node = Graph.NodeList.get(nodename((right - 1, y)))
-            print(node.Name)
+            # print(node.Name)
             node.Wall = True
     elif mode == "fill":
         for x in range(left, right):
             for y in range(top, bottom):
                 node = Graph.NodeList.get(nodename((x, y)))
-                print(node.Name)
+                # print(node.Name)
                 node.Wall = True
     elif mode == "empty":
         for x in range(left, right):
             for y in range(top, bottom):
                 node = Graph.NodeList.get(nodename((x, y)))
-                print(node.Name)
+                # print(node.Name)
                 node.Wall = False
     else:
-        raise Exception("Unrecognised Rectangle Addition Mode")
+        raise Exception("Unrecognised Rectangle Addition Mode: \"%s\"" % mode)
+    print("Rectangle drawn: (%s, %s, %s, %s) %s" % (left, top, width, height, mode))
 
 
 griddimensions = (300, 200)  # 3000 x 2000 got me a MemoryError when using the A Star Algorithm
@@ -316,13 +317,22 @@ print(startnodepos, goalnodepos)
 
 TBT = GeneralGrid()
 TBT.CreateNodeGrid(*griddimensions)
-AddBox(TBT, 0, 5, 250, 10, mode="fill")
-AddBox(TBT, 10, 10, 100, 100)
-AddBox(TBT, 50, 105, 60, 30, mode="fill")
-AddBox(TBT, 30, 120, 10, 100)
-AddBox(TBT, 20, 20, 80, 80, mode="fill")
-AddBox(TBT, 30, 40, 70, 40, mode="empty")
-AddBox(TBT, 10, 40, 3, 40, mode="empty")
+
+with open("Boxes.csv") as csvfile:
+    boxreader = csv.reader(csvfile)
+    for boxrow in boxreader:
+        print(boxrow)
+        if str(boxrow[0]) == "LEFT":
+            print("Found Header in Boxes.csv:", boxrow)
+        elif len(boxrow) == 4:
+            AddBox(TBT,
+                   int(boxrow[0]), int(boxrow[1]),
+                   int(boxrow[2]), int(boxrow[3]))
+        else:
+            AddBox(TBT,
+                   int(boxrow[0]), int(boxrow[1]),
+                   int(boxrow[2]), int(boxrow[3]),
+                   boxrow[4].lower().strip())
 
 TBTTest = AStartSearch(TBT, TBT.NodeList[nodename(startnodepos)], TBT.NodeList[nodename(goalnodepos)])
 PathTBT = ReconstructPath(TBTTest, TBT.NodeList[nodename(startnodepos)], TBT.NodeList[nodename(goalnodepos)])
