@@ -264,7 +264,7 @@ def drawarrow(surface, node, thing):
                           (nodepos[1] + 0.5 + cos(ang) * 0.4) * squaresidelength)])
 
 
-def AddBox(Graph, left, top, width, height):
+def AddBox(Graph, left, top, width, height, mode="outline"):
     # Outlines the rectangle specified from top-right edge of the object up to the right and bottom edges
     # N.B. If a rectangle goes outside of the arena, its edges will be clipped to the arena edges
     print(Graph.x)
@@ -272,36 +272,57 @@ def AddBox(Graph, left, top, width, height):
     top = max(0, top)
     right = min(left + width, Graph.w)
     bottom = min(top + height, Graph.h)
-    for x in range(left, right):
-        # Along top edge
-        node = Graph.NodeList.get(nodename((x, top)))
-        print(node.Name)
-        node.Wall = True
-        # Along bottom edge (nodes just above selected, to fill correct side vertical length)
-        node = Graph.NodeList.get(nodename((x, bottom - 1)))
-        print(node.Name)
-        node.Wall = True
-    for y in range(top + 1, bottom):
-        # Along left edge
-        node = Graph.NodeList.get(nodename((left, y)))
-        print(node.Name)
-        node.Wall = True
-        # Along right edge (nodes just to left selected, to fill correct horizontal length)
-        node = Graph.NodeList.get(nodename((right - 1, y)))
-        print(node.Name)
-        node.Wall = True
+    if mode == "outline":
+        for x in range(left, right):
+            # Along top edge
+            node = Graph.NodeList.get(nodename((x, top)))
+            print(node.Name)
+            node.Wall = True
+            # Along bottom edge (nodes just above selected, to fill correct side vertical length)
+            node = Graph.NodeList.get(nodename((x, bottom - 1)))
+            print(node.Name)
+            node.Wall = True
+        for y in range(top + 1, bottom):
+            # Along left edge
+            node = Graph.NodeList.get(nodename((left, y)))
+            print(node.Name)
+            node.Wall = True
+            # Along right edge (nodes just to left selected, to fill correct horizontal length)
+            node = Graph.NodeList.get(nodename((right - 1, y)))
+            print(node.Name)
+            node.Wall = True
+    elif mode == "fill":
+        for x in range(left, right):
+            for y in range(top, bottom):
+                node = Graph.NodeList.get(nodename((x, y)))
+                print(node.Name)
+                node.Wall = True
+    elif mode == "empty":
+        for x in range(left, right):
+            for y in range(top, bottom):
+                node = Graph.NodeList.get(nodename((x, y)))
+                print(node.Name)
+                node.Wall = False
+    else:
+        raise Exception("Unrecognised Rectangle Addition Mode")
 
 
 griddimensions = (300, 200)  # 3000 x 2000 got me a MemoryError when using the A Star Algorithm
 squaresidelength = 3  # int(min(w, h) / max(griddimensions))
 
 startnodepos = (0, 0)
-goalnodepos = (80, 110)
+goalnodepos = (80, 50)
 print(startnodepos, goalnodepos)
 
 TBT = GeneralGrid()
 TBT.CreateNodeGrid(*griddimensions)
-AddBox(TBT, 10, 0, 30, 101)
+AddBox(TBT, 0, 5, 250, 10, mode="fill")
+AddBox(TBT, 10, 10, 100, 100)
+AddBox(TBT, 50, 105, 60, 30, mode="fill")
+AddBox(TBT, 30, 120, 10, 100)
+AddBox(TBT, 20, 20, 80, 80, mode="fill")
+AddBox(TBT, 30, 40, 70, 40, mode="empty")
+AddBox(TBT, 10, 40, 3, 40, mode="empty")
 
 TBTTest = AStartSearch(TBT, TBT.NodeList[nodename(startnodepos)], TBT.NodeList[nodename(goalnodepos)])
 PathTBT = ReconstructPath(TBTTest, TBT.NodeList[nodename(startnodepos)], TBT.NodeList[nodename(goalnodepos)])
