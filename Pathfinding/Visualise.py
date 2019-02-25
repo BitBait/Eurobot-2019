@@ -207,10 +207,10 @@ def TellRobot(Path):
             ListOfThingsToDo.append("L")
             CurrentPos[0] -= 1
         elif CurrentPos[1] < NextPos[1]:
-            ListOfThingsToDo.append("F")
+            ListOfThingsToDo.append("B")
             CurrentPos[1] += 1
         elif CurrentPos[1] > NextPos[1]:
-            ListOfThingsToDo.append("B")
+            ListOfThingsToDo.append("F")
             CurrentPos[1] -= 1
 
     return ListOfThingsToDo
@@ -221,7 +221,7 @@ def ToggleWall(Graph):
     MouseY = pygame.mouse.get_pos()[1]
 
     FloorX = floor(MouseX)
-    FloorY = floor(MouseY)
+    FloorY = h - floor(MouseY)
 
     while FloorX % squaresidelength != 0:
         FloorX -= 1
@@ -240,29 +240,11 @@ def ToggleWall(Graph):
     FloorY = int(FloorY)
 
     NodePos = (FloorX, FloorY)
-    # print(NodePos)
+    print(NodePos)
 
     x = Graph.NodeList.get(nodename(NodePos))
     x.Wall = not x.Wall
     print(x.Name, "Toggled to", ["Not-Wall", "Wall"][int(x.Wall)])
-
-
-def drawarrow(surface, node, thing):
-    ang = "RFLB".find(thing) * (pi / 2)
-    nodepos = node.Position
-    pygame.draw.line(surface, COL_WHITE,
-                     ((nodepos[0] + 0.5 - cos(ang) * 0.4) * squaresidelength,
-                      (nodepos[1] + 0.5 - sin(ang) * 0.4) * squaresidelength),
-                     ((nodepos[0] + 0.5) * squaresidelength,
-                      (nodepos[1] + 0.5) * squaresidelength),
-                     10)
-    pygame.draw.polygon(surface, COL_WHITE,
-                        [((nodepos[0] + 0.5 + sin(ang) * 0.4) * squaresidelength,
-                          (nodepos[1] + 0.5 - cos(ang) * 0.4) * squaresidelength),
-                         ((nodepos[0] + 0.5 + cos(ang) * 0.4) * squaresidelength,
-                          (nodepos[1] + 0.5 + sin(ang) * 0.4) * squaresidelength),
-                         ((nodepos[0] + 0.5 - sin(ang) * 0.4) * squaresidelength,
-                          (nodepos[1] + 0.5 + cos(ang) * 0.4) * squaresidelength)])
 
 
 def AddBox(Graph, left, top, width, height, mode=""):
@@ -312,7 +294,7 @@ griddimensions = (300, 200)  # 3000 x 2000 gets a MemoryError when using the A S
 squaresidelength = 3  # int(min(w, h) / max(griddimensions))
 
 startnodepos = (0, 0)
-goalnodepos = (0, 170)
+goalnodepos = (0, 1)
 print("Start:", startnodepos, "Goal", goalnodepos)
 
 TBT = GeneralGrid()
@@ -327,12 +309,12 @@ with open("Boxes.csv") as csvfile:
             print("Found Header")
         elif len(boxrow) == 4:
             AddBox(TBT,
-                   int(boxrow[0]), int(boxrow[1]),
-                   int(boxrow[2]), int(boxrow[3]))
+                   int(int(boxrow[0]) / 10), int(int(boxrow[1]) / 10),
+                   int(int(boxrow[2]) / 10), int(int(boxrow[3]) / 10))
         else:
             AddBox(TBT,
-                   int(boxrow[0]), int(boxrow[1]),
-                   int(boxrow[2]), int(boxrow[3]),
+                   int(int(boxrow[0]) / 10), int(int(boxrow[1]) / 10),
+                   int(int(boxrow[2]) / 10), int(int(boxrow[3]) / 10),
                    boxrow[4].lower().strip())
 
 TBTTest = AStartSearch(TBT, TBT.NodeList[nodename(startnodepos)], TBT.NodeList[nodename(goalnodepos)])
@@ -348,7 +330,8 @@ while True:
         if node.Wall:
             # If it's a wall, colour it grey
             pygame.draw.rect(screen, COL_GREY,
-                             (node.Position[0] * squaresidelength, node.Position[1] * squaresidelength,
+                             (node.Position[0] * squaresidelength,
+                              h - ((1 + node.Position[1]) * squaresidelength),
                               squaresidelength, squaresidelength))
         if node in PathTBT:
             # If it's in the path...
@@ -359,19 +342,21 @@ while True:
                     # ... and if it is the start node, colour it red
                     pygame.draw.rect(screen, COL_RED,
                                      (node.Position[0] * squaresidelength,
-                                      node.Position[1] * squaresidelength,
+                                      h - ((1 + node.Position[1]) * squaresidelength),
                                       squaresidelength, squaresidelength))
                 else:
                     # ... otherwise colour it black
                     pygame.draw.rect(screen, COL_BLACK,
-                                     (node.Position[0] * squaresidelength, node.Position[1] * squaresidelength,
+                                     (node.Position[0] * squaresidelength,
+                                      h - ((1 + node.Position[1]) * squaresidelength),
                                       squaresidelength, squaresidelength))
                 # ... draw an arrow on the node
                 # drawarrow(screen, node, ListOfThings3[i])
             else:
                 # ... otherwise it is the goal node. Colour it green
                 pygame.draw.rect(screen, COL_GREEN,
-                                 (node.Position[0] * squaresidelength, node.Position[1] * squaresidelength,
+                                 (node.Position[0] * squaresidelength,
+                                  h - ((1 + node.Position[1]) * squaresidelength),
                                  squaresidelength, squaresidelength))
     # Display the newly coloured window
     pygame.display.flip()
