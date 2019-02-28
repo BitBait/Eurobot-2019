@@ -6,7 +6,7 @@ from pygame.locals import *
 
 # Initialise the pygame window
 pygame.init()
-w, h = 900, 600
+w, h = 400, 600
 screen = pygame.display.set_mode((w, h))
 
 # A whole bunch of colours, represented in the form (R, G, B)
@@ -290,11 +290,11 @@ def AddBox(Graph, left, top, width, height, mode=""):
     print("Rectangle drawn: (%s, %s, %s, %s) %s" % (left, top, width, height, mode))
 
 
-griddimensions = (300, 200)  # 3000 x 2000 gets a MemoryError when using the A Star Algorithm
-squaresidelength = 3  # int(min(w, h) / max(griddimensions))
+griddimensions = (200, 300)  # 3000 x 2000 gets a MemoryError when using the A Star Algorithm
+squaresidelength = 2  # int(min(w, h) / max(griddimensions))
 
 startnodepos = (0, 0)
-goalnodepos = (0, 1)
+goalnodepos = (199, 299)
 print("Start:", startnodepos, "Goal", goalnodepos)
 
 TBT = GeneralGrid()
