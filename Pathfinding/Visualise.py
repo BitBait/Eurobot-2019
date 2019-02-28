@@ -357,7 +357,7 @@ while True:
                 pygame.draw.rect(screen, COL_GREEN,
                                  (node.Position[0] * squaresidelength,
                                   h - ((1 + node.Position[1]) * squaresidelength),
-                                 squaresidelength, squaresidelength))
+                                  squaresidelength, squaresidelength))
     # Display the newly coloured window
     pygame.display.flip()
     # Event handling
@@ -370,10 +370,25 @@ while True:
                 # Quit if escape is pressed
                 quit()
         elif e.type == MOUSEBUTTONDOWN:
-            # Change state of a grid square that's clicked on from wall <-> not wall
-            ToggleWall(TBT)
+            mpressed = e.button
+            mpos = pygame.mouse.get_pos()
+            if mpressed == 1:
+                # Left-click for Wall toggle
+                # Change state of a grid square that's clicked on from wall <-> not wall
+                ToggleWall(TBT)
+            if mpressed == 2:
+                # Middle click for changing goal node position
+                goalnodepos = (floor(mpos[0] / squaresidelength),
+                               floor((h - mpos[1]) / squaresidelength))
+                print("Goal moved to", goalnodepos)
+            if mpressed == 3:
+                # Middle click for changing start node position
+                startnodepos = (floor(mpos[0] / squaresidelength),
+                                floor((h - mpos[1]) / squaresidelength))
+                print("Start node moved to", startnodepos)
             # And then recalculate pathfinding accordingly
             TBTTest = AStartSearch(TBT, TBT.NodeList[nodename(startnodepos)], TBT.NodeList[nodename(goalnodepos)])
-            PathTBT = ReconstructPath(TBTTest, TBT.NodeList[nodename(startnodepos)], TBT.NodeList[nodename(goalnodepos)])
+            PathTBT = ReconstructPath(TBTTest, TBT.NodeList[nodename(startnodepos)],
+                                      TBT.NodeList[nodename(goalnodepos)])
             ListOfThings3 = TellRobot(PathTBT)
             print(ListOfThings3)
