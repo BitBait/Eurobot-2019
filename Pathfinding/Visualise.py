@@ -1,6 +1,6 @@
 import collections
 import csv
-from math import pi, sin, cos, floor, sqrt
+from math import pi, sin, cos, floor, ceil, sqrt
 import pygame
 from pygame.locals import *
 
@@ -310,11 +310,11 @@ with open("Boxes.csv") as csvfile:
         elif len(boxrow) == 4:
             AddBox(TBT,
                    int(int(boxrow[0]) / 10), int(int(boxrow[1]) / 10),
-                   int(int(boxrow[2]) / 10), int(int(boxrow[3]) / 10))
+                   ceil(int(boxrow[2]) / 10), ceil(int(boxrow[3]) / 10))
         else:
             AddBox(TBT,
                    int(int(boxrow[0]) / 10), int(int(boxrow[1]) / 10),
-                   int(int(boxrow[2]) / 10), int(int(boxrow[3]) / 10),
+                   ceil(int(boxrow[2]) / 10), ceil(int(boxrow[3]) / 10),
                    boxrow[4].lower().strip())
 
 TBTTest = AStartSearch(TBT, TBT.NodeList[nodename(startnodepos)], TBT.NodeList[nodename(goalnodepos)])
